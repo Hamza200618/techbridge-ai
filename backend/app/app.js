@@ -25,6 +25,15 @@ function createApp() {
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: true }));
 
+  // Root health check (standard cloud deployment / container liveness probe).
+  app.get('/health', (req, res) => {
+    res.json({
+      success: true,
+      service: 'TechBridge AI Backend',
+      status: 'healthy',
+    });
+  });
+
   // API routes (base URL: /api — docs/API_CONTRACT.md section 2).
   app.use('/api', routes);
 

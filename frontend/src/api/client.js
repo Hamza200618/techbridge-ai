@@ -8,6 +8,13 @@ export class ApiClientError extends Error {
 }
 
 const TOKEN_KEY = 'tb_token';
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
+export function resolveUrl(path) {
+  if (!API_BASE_URL) return path;
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${API_BASE_URL}${cleanPath}`;
+}
 
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY);
@@ -27,7 +34,8 @@ export async function apiRequest(path, options = {}) {
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(path, { ...options, headers });
+  const url = resolveUrl(path);
+  const res = await fetch(url, { ...options, headers });
   const contentType = res.headers.get('content-type') || '';
 
   if (contentType.includes('application/json')) {
@@ -69,7 +77,8 @@ export async function apiBlob(path) {
   const headers = {};
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(path, { headers });
+  const url = resolveUrl(path);
+  const res = await fetch(url, { headers });
   if (!res.ok) {
     if (res.status === 401) window.dispatchEvent(new Event('tb-auth-expired'));
     let message = 'Download failed.';

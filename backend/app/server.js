@@ -42,7 +42,7 @@ async function start() {
   await projectStorage.ensureStorageLayout();
 
   const app = createApp();
-  server = app.listen(config.port, () => {
+  server = app.listen(config.port, '0.0.0.0', () => {
     logger.info(`TechBridge AI backend listening on port ${config.port}`, { env: config.env });
   });
 
